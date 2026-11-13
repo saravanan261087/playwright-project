@@ -19,7 +19,7 @@ def check_vpn():
         return True
 
     except Exception as e:
-        #print(f"❌ VPN NOT Connected")
+        print(f"❌ VPN NOT Connected")
         return False
 
 async def main():
