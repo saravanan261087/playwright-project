@@ -15,11 +15,11 @@ def check_vpn():
             timeout=10
         )
 
-        print(f"✅ VPN Connected - Status Code: {response.status_code}")
+        print(f" VPN Connected - Status Code: {response.status_code}")
         return True
 
     except Exception as e:
-        print(f"❌ VPN NOT Connected")
+        print(f" VPN NOT Connected")
         return False
 
 async def main():
@@ -77,7 +77,7 @@ async def main():
                 timeout=60000
             )
         except Exception as e:
-            print(f"❌ Unable to open device page: Application under maintanence/deployment")
+            print(f" Unable to open device page: Application under maintanence/deployment")
             await browser.close()
             sys.exit(1)
 
@@ -165,7 +165,7 @@ async def main():
                     ).strip()
 
                     if new_transaction_id != old_transaction_id:
-                        #print("✅ New transaction found")
+                        #print("New transaction found")
                         break
 
                 else:
@@ -269,9 +269,9 @@ async def main():
                     f"Result           : {result}\n\n"
                 )
                 if latest_status == "SUCCESS":
-                    print(f"✅ {operation_name} PASSED")
+                    print(f" {operation_name} PASSED")
                 else:
-                    print(f"❌ {operation_name} FAILED")
+                    print(f" {operation_name} FAILED")
 
                 # Write to file
                 log_file.write(output_text)
@@ -293,7 +293,7 @@ async def main():
                     f.write(payload_text)
                     f.flush()
 
-                print(f"✅ Payload saved")
+                print(f" Payload saved")
                 try:
                     await page.keyboard.press("Escape")
                 except:
@@ -338,14 +338,14 @@ async def main():
                         for col, value in zip(columns, row):
                             db_output.write(f"{col}: {value}\n")
 
-                    #print(f"✅ DB Output saved: {db_file}")
+                    #print(f" DB Output saved: {db_file}")
 
 
                 await run_operation_btn.click()
 
 
             except Exception as e:
-                print(f"❌ Error in {operation_name}: {e}")
+                print(f" Error in {operation_name}: {e}")
 
         await browser.close()
 
