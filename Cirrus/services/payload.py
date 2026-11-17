@@ -1,12 +1,15 @@
 import os
+from playwright.async_api import expect
+
 
 class PayloadService:
 
     @staticmethod
     async def save_payload(
-            page,
-            output_folder,
-            transaction_name):
+        page,
+        output_folder,
+        transaction_name
+    ):
 
         await page.get_by_text(
             "View Payload",
@@ -17,19 +20,35 @@ class PayloadService:
             "dialog"
         )
 
-        payload = \
-            await dialog.inner_text()
+        await expect(
+            dialog
+        ).to_be_visible()
 
-        file_name = os.path.join(
+        payload_text = await dialog.inner_text()
+
+        payload_file = os.path.join(
             output_folder,
             f"{transaction_name}_payload.txt"
         )
 
         with open(
-                file_name,
-                "w",
-                encoding="utf-8") as f:
+            payload_file,
+            "w",
+            encoding="utf-8"
+        ) as file:
+            file.write(payload_text)
 
-            f.write(payload)
+        # CRITICAL
+        try:
+            await page.keyboard.press(
+                "Escape"
+            )
 
-        return file_name
+            await page.wait_for_timeout(
+                2000
+            )
+
+        except Exception:
+            pass
+
+        return payload_file

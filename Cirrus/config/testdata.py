@@ -1,5 +1,7 @@
-GUID = "88-73-84-53-00-00-08-E8"
+GUID = "88-73-84-81-00-2E-F0-D1"
 
 OPERATIONS = [
-    "testmessagertt4"
+    "testmessagertt4",
+    "testmessagertt3",
+    "testmessagertt2",
 ]

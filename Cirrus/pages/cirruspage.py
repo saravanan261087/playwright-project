@@ -1,19 +1,16 @@
 from playwright.async_api import expect
-
 from config.settings import BASE_URL
-from config.locators import *
 
 
 class CirrusPage:
 
     def __init__(self, page):
-
         self.page = page
 
     async def open_device(
-            self,
-            guid):
-
+        self,
+        guid
+    ):
         await self.page.goto(
             f"{BASE_URL}/device/{guid}",
             wait_until="networkidle",
@@ -22,23 +19,53 @@ class CirrusPage:
 
     async def open_operation_window(self):
 
-        btn = self.page.locator(
-            RUN_OPERATION_BUTTON
+        try:
+            await self.page.keyboard.press(
+                "Escape"
+            )
+        except Exception:
+            pass
+
+        run_button = self.page.get_by_role(
+            "button",
+            name="Run Operation"
         )
 
-        await expect(btn).to_be_visible()
+        await expect(
+            run_button
+        ).to_be_visible(
+            timeout=60000
+        )
 
-        await btn.click()
+        await run_button.click()
+
+        operation_input = self.page.locator(
+            "#name"
+        )
+
+        await expect(
+            operation_input
+        ).to_be_visible(
+            timeout=60000
+        )
 
     async def select_operation(
-            self,
-            operation_name):
+        self,
+        operation_name
+    ):
 
-        operation_input = \
-            self.page.locator("#name")
+        operation_input = self.page.locator(
+            "#name"
+        )
+
+        await operation_input.clear()
 
         await operation_input.fill(
             operation_name
+        )
+
+        await self.page.wait_for_timeout(
+            6000
         )
 
         await self.page.get_by_role(
@@ -48,23 +75,48 @@ class CirrusPage:
 
     async def deploy_operation(self):
 
-        deploy_button = \
-            self.page.get_by_role(
-                "button",
-                name="Deploy"
-            )
+        deploy_btn = self.page.get_by_role(
+            "button",
+            name="Deploy"
+        )
 
-        await deploy_button.click()
+        await expect(
+            deploy_btn
+        ).to_be_enabled()
 
-        dialog = \
-            self.page.get_by_role(
-                "dialog"
-            )
+        await deploy_btn.click()
 
-        confirm = dialog.get_by_role(
+        await self.page.wait_for_timeout(
+            30000
+        )
+
+        dialog = self.page.get_by_role(
+            "dialog"
+        )
+
+        confirm_btn = dialog.get_by_role(
             "button",
             name="Deploy",
             exact=True
         )
 
-        await confirm.click()
+        await expect(
+            confirm_btn
+        ).to_be_visible(
+            timeout=10000
+        )
+
+        await confirm_btn.click()
+
+        try:
+
+            close_btn = self.page.get_by_role(
+                "button",
+                name="Close"
+            )
+
+            if await close_btn.is_visible():
+                await close_btn.click()
+
+        except Exception:
+            pass

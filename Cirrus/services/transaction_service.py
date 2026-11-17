@@ -1,80 +1,120 @@
-from config.locators import *
-from config.settings import *
+from playwright.async_api import expect
 
 
 class TransactionService:
 
-    def __init__(
-            self,
-            page):
-
+    def __init__(self, page):
         self.page = page
 
     async def wait_for_new_transaction(self):
 
-        old_transaction = \
-            await self.page.locator(
-                TRANSACTION_ID
-            ).text_content()
+        transaction_locator = self.page.locator(
+            'xpath=//*[@id="root"]/main/div[1]/div/div/div/div/div/div/div[11]/div/div/ul/li[1]/div[1]/h6[2]'
+        )
 
-        old_transaction = \
-            old_transaction.strip()
+        old_transaction_id = (
+            await transaction_locator.text_content()
+        ).strip()
 
-        for _ in range(
-                TRANSACTION_WAIT_ATTEMPTS):
+        max_attempts = 11
 
-            await self.page.wait_for_timeout(
-                TRANSACTION_WAIT_SECONDS * 1000
+        for attempt in range(max_attempts):
+
+            print(
+                f"Waiting for transaction update "
+                f"({attempt + 1}/{max_attempts})..."
             )
 
-            await self.page.reload()
+            await self.page.wait_for_timeout(
+                30000
+            )
 
-            current = await \
-                self.page.locator(
-                    TRANSACTION_ID
-                ).text_content()
+            await self.page.reload(
+                wait_until="networkidle"
+            )
 
-            current = current.strip()
+            latest_transaction = self.page.locator(
+                'xpath=//*[@id="root"]/main/div[1]/div/div/div/div/div/div/div[11]/div/div/ul/li[1]/div[1]/h6[2]'
+            )
 
-            if current != old_transaction:
-                return current
+            new_transaction_id = (
+                await latest_transaction.text_content()
+            ).strip()
+
+            if new_transaction_id != old_transaction_id:
+                print(
+                    f"New Transaction Found : "
+                    f"{new_transaction_id}"
+                )
+                return
 
         raise Exception(
-            "New transaction not generated"
+            "No new transaction generated "
+            "within expected time"
         )
 
     async def get_details(self):
 
+        transaction_name = self.page.locator(
+            'xpath=//*[@id="root"]/main/div[1]/div/div/div/div/div/div/div[11]/div/div/ul/li[1]/div[1]/h6[1]'
+        )
+
+        transaction_name = (
+            await transaction_name.text_content()
+        ).replace(
+            " - response",
+            ""
+        ).strip()
+
+        transaction_id = self.page.locator(
+            'xpath=//*[@id="root"]/main/div[1]/div/div/div/div/div/div/div[11]/div/div/ul/li[1]/div[1]/h6[2]'
+        )
+
+        transaction_id = (
+            await transaction_id.text_content()
+        ).strip()
+
+        timestamp = self.page.locator(
+            'xpath=//*[@id="root"]/main/div[1]/div/div/div/div/div/div/div[11]/div/div/ul/li[1]/div[1]/p[1]'
+        )
+
+        timestamp = (
+            await timestamp.text_content()
+        ).strip()
+
+        status = self.page.locator(
+            'xpath=//*[@id="root"]/main/div[1]/div/div/div/div/div/div/div[11]/div/div/ul/li[1]/div[2]/div/span'
+        )
+
+        status = (
+            await status.text_content()
+        ).strip()
+
         return {
-
-            "id":
-            (
-                await self.page.locator(
-                    TRANSACTION_ID
-                ).text_content()
-            ).strip(),
-
-            "timestamp":
-            (
-                await self.page.locator(
-                    TRANSACTION_TIMESTAMP
-                ).text_content()
-            ).strip(),
-
-            "status":
-            (
-                await self.page.locator(
-                    TRANSACTION_STATUS
-                ).text_content()
-            ).strip(),
-
-            "name":
-            (
-                await self.page.locator(
-                    TRANSACTION_NAME
-                ).text_content()
-            ).replace(
-                " - response",
-                ""
-            )
+            "name": transaction_name,
+            "id": transaction_id,
+            "timestamp": timestamp,
+            "status": status
         }
+
+    async def open_payload(self):
+
+        await self.page.get_by_text(
+            "View Payload",
+            exact=True
+        ).first.click()
+
+    async def close_payload(self):
+
+        try:
+
+            await self.page.keyboard.press(
+                "Escape"
+            )
+
+            await self.page.wait_for_timeout(
+                2000
+            )
+
+        except Exception:
+            pass

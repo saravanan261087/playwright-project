@@ -42,13 +42,17 @@ async def test_operations(page):
 
     cirrus = CirrusPage(page)
 
-    await cirrus.open_device(GUID)
+    await cirrus.open_device(
+        GUID
+    )
 
-    await cirrus.open_operation_window()
+    executor = OperationService(
+        cirrus
+    )
 
-    executor = OperationService(cirrus)
-
-    transaction = TransactionService(page)
+    transaction = TransactionService(
+        page
+    )
 
     with open(
         report_path,
@@ -61,6 +65,10 @@ async def test_operations(page):
             print(
                 f"\nRunning Operation: {operation}"
             )
+
+            # IMPORTANT:
+            # Open operation window for EVERY operation
+            await cirrus.open_operation_window()
 
             await executor.execute(
                 operation
