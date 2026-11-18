@@ -5,7 +5,7 @@ import psycopg2
 import requests
 from playwright.async_api import async_playwright, expect
 from datetime import datetime
-
+import pyautogui
 def check_vpn():
     """Check if VPN/Internal application is reachable."""
     try:

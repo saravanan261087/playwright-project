@@ -1,6 +1,7 @@
 import os
 
 
+
 class ScreenshotManager:
 
     @staticmethod
@@ -28,7 +29,7 @@ class ScreenshotManager:
         # Full page screenshot at current scroll position
         await page.screenshot(
             path=screenshot_file,
-            full_page=False
+            full_page=True
         )
 
         print(
