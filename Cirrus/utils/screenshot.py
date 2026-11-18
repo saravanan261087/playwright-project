@@ -1,7 +1,4 @@
 import os
-
-
-
 class ScreenshotManager:
 
     @staticmethod
