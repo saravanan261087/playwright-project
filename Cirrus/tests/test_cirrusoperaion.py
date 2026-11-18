@@ -204,9 +204,9 @@ async def test_operations(page):
                 except Exception:
                     pass
 
-        # ==================================================
+        # =============================================
         # FINAL EXECUTION SUMMARY
-        # ==================================================
+        # =============================================
 
         total_count = len(OPERATIONS)
         passed_count = len(passed_operations)
