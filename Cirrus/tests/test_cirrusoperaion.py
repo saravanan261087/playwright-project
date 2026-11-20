@@ -1,15 +1,11 @@
 import os
 from datetime import datetime
-
 import pytest
-
 from config.testdata import GUID, OPERATIONS
 from pages.cirruspage import CirrusPage
-
 from utils.vpn import VPNChecker
 from utils.report import ReportManager
 from utils.screenshot import ScreenshotManager
-
 from services.operationservice import OperationService
 from services.transaction_service import TransactionService
 from services.payload import PayloadService
