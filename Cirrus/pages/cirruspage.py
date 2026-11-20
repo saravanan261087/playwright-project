@@ -7,10 +7,7 @@ class CirrusPage:
     def __init__(self, page):
         self.page = page
 
-    async def open_device(
-        self,
-        guid
-    ):
+    async def open_device(self,guid):
         await self.page.goto(
             f"{BASE_URL}/device/{guid}",
             wait_until="networkidle",
